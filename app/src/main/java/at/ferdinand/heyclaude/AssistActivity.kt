@@ -133,8 +133,11 @@ class AssistActivity : Activity() {
             b.text = label
             b.isAllCaps = false
             b.textSize = 13f
+            b.setPadding(dp(2), 0, dp(2), 0)
+            b.minWidth = 0
+            b.minimumWidth = 0
             b.setOnClickListener { action() }
-            buttons.addView(b)
+            buttons.addView(b, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         }
         addBtn("Senden") {
             val t = input.text.toString().trim()
@@ -208,7 +211,8 @@ class AssistActivity : Activity() {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().toLanguageTag())
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1500L)
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2500L)
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2500L)
         }
         statusTv.text = "🎙  Einen Moment …"
         r.startListening(i)
