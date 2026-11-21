@@ -252,6 +252,11 @@ class AssistActivity : Activity() {
         recognizer?.cancel()
         (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(input.windowToken, 0)
 
+        if (prefs.getBoolean("claudeApp", false)) {
+            sendToClaudeApp(prompt)
+            return
+        }
+
         val key = prefs.getString("apiKey", "").orEmpty().trim()
         if (key.isEmpty()) {
             statusTv.text = "Kein API-Key – bitte in der App eintragen"
@@ -280,6 +285,23 @@ class AssistActivity : Activity() {
                 }
             }
         }.start()
+    }
+
+    /** Ohne API-Key: Frage an die offizielle Claude-App übergeben (läuft über dein Abo). */
+    private fun sendToClaudeApp(prompt: String) {
+        val i = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, prompt)
+            setPackage("com.anthropic.claude")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+        try {
+            startActivity(i)
+            finish()
+        } catch (e: Exception) {
+            statusTv.text = "Claude-App nicht gefunden – bitte aus dem Play Store installieren"
+            busy = false
+        }
     }
 
     private fun showAnswer(answer: String) {

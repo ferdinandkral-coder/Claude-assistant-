@@ -43,6 +43,7 @@ class MainActivity : Activity() {
     private lateinit var wisprSw: Switch
     private lateinit var speakSw: Switch
     private lateinit var webSw: Switch
+    private lateinit var appSw: Switch
     private val ui = Handler(Looper.getMainLooper())
     @Volatile private var downloading = false
     @Volatile private var dlStatus = ""
@@ -123,6 +124,9 @@ class MainActivity : Activity() {
         label("Hey Claude", 26f, true)
         statusTv = label("", 14f)
 
+        appSw = toggle("An die Claude-App schicken (kein API-Key nötig, läuft über dein Abo – " +
+            "dort einmal auf Senden tippen)", prefs.getBoolean("claudeApp", false))
+
         label("Anthropic API-Key", bold = true)
         keyEt = edit(prefs.getString("apiKey", "").orEmpty(),
             InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
@@ -172,6 +176,7 @@ class MainActivity : Activity() {
             .putBoolean("wispr", wisprSw.isChecked)
             .putBoolean("speak", speakSw.isChecked)
             .putBoolean("web", webSw.isChecked)
+            .putBoolean("claudeApp", appSw.isChecked)
             .apply()
     }
 
@@ -180,8 +185,8 @@ class MainActivity : Activity() {
     // ---------------- Start mit allen Voraussetzungen ----------------
 
     private fun ensureAndStart() {
-        if (prefs.getString("apiKey", "").isNullOrBlank()) {
-            toast("Bitte zuerst den API-Key eintragen")
+        if (!prefs.getBoolean("claudeApp", false) && prefs.getString("apiKey", "").isNullOrBlank()) {
+            toast("Bitte API-Key eintragen oder „An die Claude-App schicken“ einschalten")
             return
         }
         val needed = mutableListOf<String>()
